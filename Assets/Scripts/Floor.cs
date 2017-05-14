@@ -8,8 +8,10 @@ public class Floor : MonoBehaviour
 
     public GameObject platformPrefab;
 
-    public Vector2 grid;
+    public Vector2 grid;    
     public float spacing;
+
+    public int amount;
 
     public Platform[] platforms { private set; get; }
 
@@ -36,7 +38,7 @@ public class Floor : MonoBehaviour
 
     private void Start()
     {
-        UGL.contentsManager.CreateInstancePool(new InstancePool("Platforms", platformPrefab, tiles.Length));
+        UGL.contentsManager.CreateInstancePool(new InstancePool("Platforms", platformPrefab, amount));
 
         for (int i = 0; i < grid.y; i++)
         {
@@ -67,10 +69,10 @@ public class Floor : MonoBehaviour
                     {
                         GameObject platform = UGL.contentsManager.CreateInstance("Platforms");
                         tiles[index].platform = platform.GetComponent<Platform>();
-                        platform.transform.localPosition = new Vector3(tiles[index].position.x,
-                            tiles[index].platform.downYPos, tiles[index].position.z);
+                        platform.transform.localPosition = new Vector3(tiles[index].position.x, tiles[index].platform.downYPos, tiles[index].position.z);
 
                         tiles[index].platform.index = index;
+                        tiles[index].platform.downDelay = Random.Range(tiles[index].platform.downMinDelay, tiles[index].platform.downMaxDelay);
                     }
 
 
@@ -78,14 +80,6 @@ public class Floor : MonoBehaviour
                     {                        
                         tiles[index].platform.isDown = false;
                         tiles[index].platform.elapsedTime = 0f;
-                    }
-                }
-
-                else
-                {
-                    if (tiles[index].platform)
-                    {
-                        tiles[index].platform.isDown = true;
                     }
                 }
             }
@@ -101,5 +95,8 @@ public class Floor : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(detectPosition, distance);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(transform.localPosition, new Vector3(spacing * (grid.x - 1), 0f, spacing * (grid.y - 1)));
     }
 }

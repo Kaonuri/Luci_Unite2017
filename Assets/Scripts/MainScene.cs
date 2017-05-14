@@ -1,4 +1,5 @@
 ﻿using Ultimate;
+using UnityEngine;
 using Time = UnityEngine.Time;
 
 public class MainScene : Scene
@@ -9,7 +10,7 @@ public class MainScene : Scene
 
     public override void OnEnterScene()
     {
-        StartCoroutine(AirVRCameraFade.FadeAllCameras(this, true, 1f));
+        StartCoroutine(AirVRCameraFade.FadeAllCameras(this, true, 3f));
         
         _timer.Set(duration);
     }
@@ -22,7 +23,7 @@ public class MainScene : Scene
         if (_timer.expired)
         {
             _timer.Reset();
-            StartCoroutine(FadeOutAndChangeScene("Title", 2f));
+            StartCoroutine(FadeOutAndChangeScene("Title", 10f));
         }
     }
 

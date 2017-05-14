@@ -5,13 +5,12 @@ public class ThirdPersonCamera : MonoBehaviour
     public Transform target;
     public float rotateSpeed;
     public float zoomSpeed;
+
+    public float height;
+    [SerializeField] private float distance;
+
     public float nearlistDistance;
     public float farthestDistance;
-
-    private void Start()
-    {
-        transform.LookAt(target);
-    }
 
     private void Update()
     {
@@ -27,30 +26,56 @@ public class ThirdPersonCamera : MonoBehaviour
     }
 
     private void LateUpdate()
-    {
-        transform.RotateAround(target.position, transform.TransformDirection(Vector3.up), rotateSpeed * Time.deltaTime);
+    {   
+//        Vector3 tmpPos = (transform.position - target.position).normalized * distance;
+//        tmpPos.y = 2f;
+//        transform.position = tmpPos;
+//
+//        transform.forward = target.position - transform.position;
 
-        Vector3 newForward = target.position - transform.position;
-        transform.forward = newForward;
+        Vector3 lookAtPos = target.position;
+        lookAtPos.y = height;
 
-        Vector3 tmpPos = transform.position;
-        tmpPos.y = 2f;
-        transform.position = tmpPos;
+        transform.LookAt(lookAtPos);
+
+        distance = Vector3.Distance(transform.position, target.position);
+
+        if (distance < nearlistDistance)
+        {
+            distance = nearlistDistance;
+        }
+
+        if (distance > farthestDistance)
+        {
+            distance = farthestDistance;
+        }
+
+        transform.Translate(Vector3.right * Time.deltaTime * rotateSpeed);
+
+        
+        //        transform.RotateAround(target.position, transform.TransformDirection(Vector3.up), rotateSpeed * Time.deltaTime);
+        //        transform.forward = target.position - transform.position;
     }
 
     public void ZoomIn()
     {
-        if (Vector3.Distance(transform.position, target.position) < nearlistDistance)
+        if (distance < nearlistDistance)
+        {
+            distance = nearlistDistance;
             return;
+        }            
 
-        transform.Translate(Vector3.forward * Time.deltaTime * zoomSpeed);
+        distance -= zoomSpeed * Time.deltaTime;
     }
 
     public void ZoomOut()
     {
-        if (Vector3.Distance(transform.position, target.position) > farthestDistance)
+        if (distance < farthestDistance)
+        {
+            distance = farthestDistance;
             return;
+        }            
 
-        transform.Translate(Vector3.back * Time.deltaTime * zoomSpeed);
+        distance += zoomSpeed * Time.deltaTime;
     }
 }
