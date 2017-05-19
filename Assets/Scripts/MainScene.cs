@@ -1,4 +1,6 @@
-﻿using Ultimate;
+﻿using System.Collections;
+using Ultimate;
+using UnityEngine;
 using Time = UnityEngine.Time;
 
 public class MainScene : Scene
@@ -7,10 +9,24 @@ public class MainScene : Scene
 
     public float duration;
 
+    public GameObject[] particles;
+    public float particleActivateDelay;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        foreach (var particle in particles)
+        {
+            particle.SetActive(false);
+        }
+    }
+
     public override void OnEnterScene()
     {
-        StartCoroutine(AirVRCameraFade.FadeAllCameras(this, true, 1f));
-        
+        Cursor.visible = false;
+
+        StartCoroutine(AirVRCameraFade.FadeAllCameras(this, true, 3f));
+        StartCoroutine(ParticleActivate());
         _timer.Set(duration);
     }
 
@@ -22,11 +38,25 @@ public class MainScene : Scene
         if (_timer.expired)
         {
             _timer.Reset();
-            StartCoroutine(FadeOutAndChangeScene("Title", 2f));
+            StartCoroutine(FadeOutAndChangeScene("Title", 10f));
         }
     }
 
     public override void OnExitScene()
     {
+        UGL.contentsManager.ClearInstancePools();
+    }
+
+    private IEnumerator ParticleActivate()
+    {
+        foreach (var particle in particles)
+        {
+            particle.SetActive(false);
+        }
+        yield return new WaitForSeconds(particleActivateDelay);
+        foreach (var particle in particles)
+        {
+            particle.SetActive(true);
+        }
     }
 }

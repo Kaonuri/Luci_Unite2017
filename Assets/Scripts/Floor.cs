@@ -8,8 +8,10 @@ public class Floor : MonoBehaviour
 
     public GameObject platformPrefab;
 
-    public Vector2 grid;
+    public Vector2 grid;    
     public float spacing;
+
+    public int amount;
 
     public Platform[] platforms { private set; get; }
 
@@ -29,14 +31,24 @@ public class Floor : MonoBehaviour
 
     private Tile[] tiles;
 
+    public Transform followtarget;
+    private float updateDelay = 0.1f;
+    private float elpasedTime = 0f;
+
     private void Awake()
     {
-        tiles = new Tile[(int)(grid.x * grid.y)];        
-    }
+        followtarget.position = GameManager.Instance.InitHipPosition;
 
-    private void Start()
-    {
-        UGL.contentsManager.CreateInstancePool(new InstancePool("Platforms", platformPrefab, tiles.Length));
+        tiles = new Tile[(int)(grid.x * grid.y)];    
+        
+        UGL.contentsManager.CreateInstancePool(new InstancePool("Platforms", platformPrefab, amount));
+
+        if (GameManager.Instance != null)
+        {
+            Vector3 newPos = GameManager.Instance.InitHipPosition;
+            newPos.y = 0f;
+            transform.position = newPos;
+        }   
 
         for (int i = 0; i < grid.y; i++)
         {
@@ -45,13 +57,19 @@ public class Floor : MonoBehaviour
                 float platfromXPos = (-1 * (grid.x / 2) + j) * spacing;
                 float platfromZPos = (-1 * (grid.y / 2) + i) * spacing;
 
-                tiles[(int)(i * grid.y) + j] = new Tile(new Vector3(platfromXPos, 0f, platfromZPos));       
+                tiles[(int)(i * grid.y) + j] = new Tile(new Vector3(transform.position.x + platfromXPos, 0f, transform.position.z + platfromZPos));
             }
         }
     }
 
     private void Update()
     {
+        if (elpasedTime < updateDelay)
+        {
+            elpasedTime += UnityEngine.Time.deltaTime;
+            return;
+        }
+
         detectPosition = target.position;
         detectPosition.y = 0f;
 
@@ -67,10 +85,10 @@ public class Floor : MonoBehaviour
                     {
                         GameObject platform = UGL.contentsManager.CreateInstance("Platforms");
                         tiles[index].platform = platform.GetComponent<Platform>();
-                        platform.transform.localPosition = new Vector3(tiles[index].position.x,
-                            tiles[index].platform.downYPos, tiles[index].position.z);
+                        platform.transform.localPosition = new Vector3(tiles[index].position.x, tiles[index].platform.downYPos, tiles[index].position.z);
 
                         tiles[index].platform.index = index;
+                        tiles[index].platform.downDelay = Random.Range(tiles[index].platform.downMinDelay, tiles[index].platform.downMaxDelay);
                     }
 
 
@@ -78,14 +96,6 @@ public class Floor : MonoBehaviour
                     {                        
                         tiles[index].platform.isDown = false;
                         tiles[index].platform.elapsedTime = 0f;
-                    }
-                }
-
-                else
-                {
-                    if (tiles[index].platform)
-                    {
-                        tiles[index].platform.isDown = true;
                     }
                 }
             }
@@ -101,5 +111,8 @@ public class Floor : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(detectPosition, distance);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(transform.localPosition, new Vector3(spacing * (grid.x - 1), 0f, spacing * (grid.y - 1)));
     }
 }

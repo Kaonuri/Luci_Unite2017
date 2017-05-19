@@ -8,7 +8,10 @@ public class Platform : MonoBehaviour
     public float upDuration;
     public float downYPos;
     public float downDuration;
-    public float downDelay;
+    public float downMinDelay;
+    public float downMaxDelay;
+
+    public float downDelay { set; get; }
 
     public bool isDown = false;
 
@@ -25,18 +28,23 @@ public class Platform : MonoBehaviour
 
     private void Update()
     {
-        elapsedTime += Time.deltaTime;
-
         if (!isDown)
         {
             Vector3 destination = transform.localPosition;
             destination.y = upYPos;
 
             transform.localPosition = Vector3.Lerp(transform.localPosition, destination, Time.deltaTime / upDuration);
+
+            if (transform.localPosition.y >= upYPos * 1.01f)
+            {
+                isDown = true;
+            }
         }
 
         else
         {
+            elapsedTime += Time.deltaTime;
+
             if (elapsedTime >= downDelay)
             {
                 Vector3 destination = transform.localPosition;

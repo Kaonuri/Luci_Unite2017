@@ -6,6 +6,7 @@ using Input = UnityEngine.Input;
 public class GameManager : MonoBehaviour
 {
     public bool autoPlay = false;
+    public Vector3 InitHipPosition;
 
     public static GameManager Instance { private set; get; }
 
