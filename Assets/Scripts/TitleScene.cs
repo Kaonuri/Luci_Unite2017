@@ -1,4 +1,5 @@
 ﻿using TMPro;
+using Ultimate;
 using UnityEngine;
 using Input = UnityEngine.Input;
 using Time = UnityEngine.Time;
@@ -6,7 +7,9 @@ using Time = UnityEngine.Time;
 public class TitleScene : Scene
 {
     public FixedDurationMessage message;
-    public float autoPlayDelay = 5f;    
+    public float autoPlayDelay = 5f;
+
+    public Transform hip;
 
     private Timer _timer = new Timer();
 
@@ -41,9 +44,16 @@ public class TitleScene : Scene
             message.Show(2f);
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            GameManager.Instance.InitHipPosition = hip.transform.position;
+            message.GetComponent<TextMeshPro>().text = "Hip Position Update to " + GameManager.Instance.InitHipPosition;
+            message.Show(2f);
+        }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            StartCoroutine(FadeOutAndChangeScene("Main", 2f));
+            StartCoroutine(FadeOutAndChangeScene("Main_Neuron", 2f));
         }
 
         if (GameManager.Instance.autoPlay)
@@ -57,6 +67,6 @@ public class TitleScene : Scene
     }
 
     public override void OnExitScene()
-    {
+    {        
     }
 }

@@ -33,12 +33,16 @@ public class Floor : MonoBehaviour
 
     private void Awake()
     {
-        tiles = new Tile[(int)(grid.x * grid.y)];        
-    }
-
-    private void Start()
-    {
+        tiles = new Tile[(int)(grid.x * grid.y)];    
+        
         UGL.contentsManager.CreateInstancePool(new InstancePool("Platforms", platformPrefab, amount));
+
+        if (GameManager.Instance != null)
+        {
+            Vector3 newPos = GameManager.Instance.InitHipPosition;
+            newPos.y = 0f;
+            transform.position = newPos;
+        }   
 
         for (int i = 0; i < grid.y; i++)
         {
@@ -47,7 +51,7 @@ public class Floor : MonoBehaviour
                 float platfromXPos = (-1 * (grid.x / 2) + j) * spacing;
                 float platfromZPos = (-1 * (grid.y / 2) + i) * spacing;
 
-                tiles[(int)(i * grid.y) + j] = new Tile(new Vector3(platfromXPos, 0f, platfromZPos));       
+                tiles[(int)(i * grid.y) + j] = new Tile(new Vector3(transform.position.x + platfromXPos, 0f, transform.position.z + platfromZPos));
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using Ultimate;
+﻿using System.Collections;
+using Ultimate;
 using UnityEngine;
 using Time = UnityEngine.Time;
 
@@ -8,10 +9,13 @@ public class MainScene : Scene
 
     public float duration;
 
+    public GameObject[] particles;
+    public float particleActivateDelay;
+
     public override void OnEnterScene()
     {
         StartCoroutine(AirVRCameraFade.FadeAllCameras(this, true, 3f));
-        
+        StartCoroutine(ParticleActivate());
         _timer.Set(duration);
     }
 
@@ -29,5 +33,19 @@ public class MainScene : Scene
 
     public override void OnExitScene()
     {
+        UGL.contentsManager.ClearInstancePools();
+    }
+
+    private IEnumerator ParticleActivate()
+    {
+        foreach (var particle in particles)
+        {
+            particle.SetActive(false);
+        }
+        yield return new WaitForSeconds(particleActivateDelay);
+        foreach (var particle in particles)
+        {
+            particle.SetActive(true);
+        }
     }
 }
